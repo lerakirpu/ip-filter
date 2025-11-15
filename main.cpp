@@ -111,8 +111,4 @@ int main() {
     });
     
     return 0;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> a4ababa8710bc826c16bc5a79746d6e3b73e7b15
