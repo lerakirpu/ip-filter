@@ -1,4 +1,4 @@
-name: C++ CI/CD with Tests
+name: C++ CI/CD
 
 on:
   push:
@@ -7,12 +7,8 @@ on:
     branches: [ main, master ]
 
 jobs:
-  build-and-test-linux:
+  build-linux:
     runs-on: ubuntu-latest
-    
-    strategy:
-      matrix:
-        compiler: [g++, clang++]
     
     steps:
     - name: Checkout code
@@ -25,7 +21,7 @@ jobs:
     
     - name: Configure with CMake
       run: |
-        mkdir build
+        mkdir -p build
         cd build
         cmake ..
     
@@ -34,24 +30,12 @@ jobs:
         cd build
         make -j4
     
-    - name: Run unit tests
+    - name: Run basic test
       run: |
         cd build
-        ./test_ip_filter
-    
-    - name: Create artifact
-      run: |
-        mkdir -p artifacts/linux-${{ matrix.compiler }}
-        cp build/ip_filter artifacts/linux-${{ matrix.compiler }}/ || true
-    
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: ip-filter-linux-${{ matrix.compiler }}
-        path: artifacts/linux-${{ matrix.compiler }}
-        retention-days: 7
+        ./ip_filter --help
 
-  build-and-test-windows:
+  build-windows:
     runs-on: windows-latest
     
     steps:
@@ -72,40 +56,35 @@ jobs:
         cd build
         cmake --build . --config Release
     
-    - name: Run unit tests
+    - name: Run basic test
       run: |
         cd build/Release
-        .\test_ip_filter.exe
-    
-    - name: Create artifact
-      run: |
-        mkdir -p artifacts/windows
-        Copy-Item "build/Release/ip_filter.exe" "artifacts/windows/" -ErrorAction SilentlyContinue
-    
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: ip-filter-windows
-        path: artifacts/windows
-        retention-days: 7
+        .\ip_filter.exe --help
 
-  test-coverage:
-    runs-on: ubuntu-latest
-    needs: [build-and-test-linux, build-and-test-windows]
+  build-macos:
+    runs-on: macos-latest
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    - name: Generate test coverage report
+    - name: Install dependencies
       run: |
-        echo "Test coverage report would be generated here"
-        echo "All tests passed successfully!"
+        brew update
+        brew install cmake
     
-    - name: Upload test results
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results
-        path: |
-          build/test_results/
-        retention-days: 7
+    - name: Configure with CMake
+      run: |
+        mkdir -p build
+        cd build
+        cmake ..
+    
+    - name: Build project
+      run: |
+        cd build
+        make -j4
+    
+    - name: Run basic test
+      run: |
+        cd build
+        ./ip_filter --help

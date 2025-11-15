@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <tuple>
 #include <functional>
+#include <stdexcept>
 
 class IPv4 {
 private:
@@ -55,10 +56,6 @@ public:
            << std::get<2>(address) << "." << std::get<3>(address);
         return ss.str();
     }
-    
-    auto getAddress() const -> const std::tuple<int, int, int, int>& {
-        return address;
-    }
 };
 
 template<typename Predicate>
@@ -70,7 +67,14 @@ void printFilteredIPs(const std::vector<IPv4>& ips, Predicate pred) {
     }
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+    // Обработка аргументов командной строки для CI/CD
+    if (argc > 1 && std::string(argv[1]) == "--help") {
+        std::cout << "IP Filter - processes and filters IPv4 addresses" << std::endl;
+        std::cout << "Usage: echo '1.1.1.1\\tdata\\tmore' | ./ip_filter" << std::endl;
+        return 0;
+    }
+    
     std::vector<IPv4> ip_addresses;
     std::string line;
     

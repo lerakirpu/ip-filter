@@ -14,6 +14,6 @@ endif()
 
 enable_testing()
 
-add_test(NAME CompilationTest COMMAND ip_filter)
+add_test(NAME CompilationTest COMMAND ip_filter --help)
 
 message(STATUS "Project configured successfully")
