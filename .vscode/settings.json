@@ -1,0 +1,10 @@
+{
+    "cmake.configureOnOpen": true,
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "testMate.cpp.test.advancedExecutableConfigs": [
+        {
+            "pattern": "build/test_ip_filter*",
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
