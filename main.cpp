@@ -6,6 +6,7 @@
 #include <tuple>
 #include <functional>
 #include <stdexcept>
+#include "head/base.hpp"
 
 class IPv4 {
 private:
@@ -13,18 +14,13 @@ private:
 
 public:
     IPv4(const std::string& ip_str) {
-        std::stringstream ss(ip_str);
-        std::string token;
-        int octets[4];
+        std::vector<std::string> octets_str = split(ip_str, '.');
+        if (octets_str.size() != 4) throw std::invalid_argument("Invalid IP format");
         
+        int octets[4];
         for (int i = 0; i < 4; ++i) {
-            if (!std::getline(ss, token, '.')) {
-                throw std::invalid_argument("Invalid IP format");
-            }
-            octets[i] = std::stoi(token);
-            if (octets[i] < 0 || octets[i] > 255) {
-                throw std::invalid_argument("Octet out of range");
-            }
+            octets[i] = std::stoi(octets_str[i]);
+            if (octets[i] < 0 || octets[i] > 255) throw std::invalid_argument("Octet out of range");
         }
         address = std::make_tuple(octets[0], octets[1], octets[2], octets[3]);
     }
@@ -39,39 +35,27 @@ public:
         }
     }
     
-    auto operator>(const IPv4& other) const -> bool {
-        return address > other.address;
-    }
+    auto operator>(const IPv4& other) const -> bool { return address > other.address; }
     
     bool hasOctet(int value) const {
-        return std::get<0>(address) == value || 
-               std::get<1>(address) == value || 
-               std::get<2>(address) == value || 
-               std::get<3>(address) == value;
+        return std::get<0>(address) == value || std::get<1>(address) == value || 
+               std::get<2>(address) == value || std::get<3>(address) == value;
     }
     
     auto toString() const -> std::string {
-        std::stringstream ss;
-        ss << std::get<0>(address) << "." << std::get<1>(address) << "." 
-           << std::get<2>(address) << "." << std::get<3>(address);
-        return ss.str();
+        return std::to_string(std::get<0>(address)) + "." + std::to_string(std::get<1>(address)) + "." +
+               std::to_string(std::get<2>(address)) + "." + std::to_string(std::get<3>(address));
     }
 };
 
 template<typename Predicate>
 void printFilteredIPs(const std::vector<IPv4>& ips, Predicate pred) {
-    for (const auto& ip : ips) {
-        if (pred(ip)) {
-            std::cout << ip.toString() << std::endl;
-        }
-    }
+    for (const auto& ip : ips) if (pred(ip)) std::cout << ip.toString() << std::endl;
 }
 
 int main(int argc, char* argv[]) {
-    // Обработка аргументов командной строки для CI/CD
     if (argc > 1 && std::string(argv[1]) == "--help") {
-        std::cout << "IP Filter - processes and filters IPv4 addresses" << std::endl;
-        std::cout << "Usage: echo '1.1.1.1\\tdata\\tmore' | ./ip_filter" << std::endl;
+        std::cout << "IP Filter - processes and filters IPv4 addresses\nUsage: echo '1.1.1.1\\tdata' | ./ip_filter" << std::endl;
         return 0;
     }
     
@@ -79,40 +63,16 @@ int main(int argc, char* argv[]) {
     std::string line;
     
     while (std::getline(std::cin, line)) {
-        std::stringstream ss(line);
-        std::string ip_str;
-        
-        if (std::getline(ss, ip_str, '\t')) {
-            try {
-                ip_addresses.emplace_back(ip_str);
-            } catch (...) {
-                continue;
-            }
-        }
+        std::vector<std::string> parts = split(line, '\t');
+        if (!parts.empty()) try { ip_addresses.emplace_back(parts[0]); } catch (...) { continue; }
     }
     
-    auto reverse_lex_comparator = [](const IPv4& a, const IPv4& b) { 
-        return a > b; 
-    };
-    std::sort(ip_addresses.begin(), ip_addresses.end(), reverse_lex_comparator);
+    std::sort(ip_addresses.begin(), ip_addresses.end(), [](const IPv4& a, const IPv4& b) { return a > b; });
     
-    // 1. Полный список после сортировки
     printFilteredIPs(ip_addresses, [](const IPv4&) { return true; });
-    
-    // 2. Первый байт равен 1
-    printFilteredIPs(ip_addresses, [](const IPv4& ip) { 
-        return ip.getOctet(0) == 1; 
-    });
-    
-    // 3. Первый байт 46, второй 70
-    printFilteredIPs(ip_addresses, [](const IPv4& ip) { 
-        return ip.getOctet(0) == 46 && ip.getOctet(1) == 70; 
-    });
-    
-    // 4. Любой байт равен 46
-    printFilteredIPs(ip_addresses, [](const IPv4& ip) { 
-        return ip.hasOctet(46); 
-    });
+    printFilteredIPs(ip_addresses, [](const IPv4& ip) { return ip.getOctet(0) == 1; });
+    printFilteredIPs(ip_addresses, [](const IPv4& ip) { return ip.getOctet(0) == 46 && ip.getOctet(1) == 70; });
+    printFilteredIPs(ip_addresses, [](const IPv4& ip) { return ip.hasOctet(46); });
     
     return 0;
 }
