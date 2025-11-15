@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
 	"InstallScripts" : 
 	[
@@ -5,3 +6,12 @@
 	],
 	"Parallel" : false
 }
+=======
+{
+	"InstallScripts" : 
+	[
+		"C:/Users/user/Documents/lab2/build/_deps/googletest-subbuild/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
+>>>>>>> a4ababa8710bc826c16bc5a79746d6e3b73e7b15
