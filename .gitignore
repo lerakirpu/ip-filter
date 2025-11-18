@@ -1,1 +1,6 @@
-/build/
+build/
+*.user
+*.swp
+*.swo
+*~
+.DS_Store

@@ -1,9 +1,8 @@
-#ifndef BASE_HPP
-#define BASE_HPP
-#include<vector>
-#include<string>
+#pragma once
+
+#include <iostream>
+#include <string>
+#include <vector>
 
 std::vector<std::string> split(const std::string &str, char d);
-void print(const std::vector<std::vector<int>> &vector);
-
-#endif
+void print_ip(const std::vector<int>& ip);

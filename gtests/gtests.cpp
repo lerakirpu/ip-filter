@@ -1,7 +1,7 @@
 #include <vector>
 #include <string>
 #include <gtest/gtest.h>
-#include "../head/base.hpp"
+#include "head/base.hpp"    
 
 TEST(SplitTest, TabDelimiter) {
     std::vector<std::string> expected{"101.105.104.255", "0", "1"};

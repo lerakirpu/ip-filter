@@ -1,62 +1,66 @@
-#include<vector>
-#include<string>
-#include<algorithm>
-#include<iostream>
-#include<tuple>
-#include "head/base.hpp"
+#include <cassert>
+#include <cstdlib>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include "base.hpp"
 
-int main()
-{
-    try
-    {
-        std::vector<std::vector<std::string>> ip_pool;
-        std::vector<std::vector<int>> ip_pool_int;
-
-        for (std::string line; std::getline(std::cin, line);)
-        {
-            std::vector<std::string> v = split(line, '\t');
-            ip_pool.push_back(split(v.at(0), '.'));
-        }
-
-        for (const auto &ip_str : ip_pool)
-        {
-            std::vector<int> temp_vector;
-            for (const auto &ip_part : ip_str)
-            {
-                temp_vector.push_back(std::stoi(ip_part));
+int main(int, char **) {
+    try {
+        std::vector<std::vector<int>> ip_pool;
+        
+        for(std::string line; std::getline(std::cin, line);) {
+            auto v = split(line, '\t');
+            auto ip_str = v.at(0);
+            auto ip = split(ip_str, '.');
+            std::vector<int> ip_int;
+            for(const auto& octet : ip) {
+                ip_int.push_back(std::stoi(octet));
             }
-            ip_pool_int.push_back(temp_vector);
+            ip_pool.push_back(ip_int);
         }
 
-        std::sort(ip_pool_int.begin(), ip_pool_int.end(), [](const std::vector<int> &first, const std::vector<int> &second)
-                  { return first > second; });
+        // Reverse lexicographically sort
+        std::sort(ip_pool.begin(), ip_pool.end(), [](const std::vector<int>& a, const std::vector<int>& b) {
+            for(size_t i = 0; i < std::min(a.size(), b.size()); ++i) {
+                if(a[i] != b[i]) {
+                    return a[i] > b[i];
+                }
+            }
+            return a.size() > b.size();
+        });
 
-        print(ip_pool_int); // вывод всех IP-адресов
+        // Print all IPs
+        for(const auto& ip : ip_pool) {
+            print_ip(ip);
+        }
 
-        std::vector<std::vector<int>> print1, print4670, print46;
-
-        for (const auto &ip : ip_pool_int)
-        {
-            if (ip[0] == 1)
-                print1.push_back(ip);
-            if (ip[0] == 46)
-            {
-                print46.push_back(ip);
-                if (ip[1] == 70)
-                    print4670.push_back(ip);
+        // Filter by first byte = 1
+        for(const auto& ip : ip_pool) {
+            if(ip.at(0) == 1) {
+                print_ip(ip);
             }
         }
-        auto s= std::make_tuple(print1,print4670,print46);
-        print(std::get<0>(s));
-        print(std::get<1>(s));
-        print(std::get<2>(s));
-        int a;
-        std::cin>>a;
-    }
-    catch (const std::exception &e)
-    {
+
+        // Filter by first byte = 46 and second = 70
+        for(const auto& ip : ip_pool) {
+            if(ip.at(0) == 46 && ip.at(1) == 70) {
+                print_ip(ip);
+            }
+        }
+
+        // Filter by any byte = 46
+        for(const auto& ip : ip_pool) {
+            if(std::any_of(ip.begin(), ip.end(), [](int byte) { return byte == 46; })) {
+                print_ip(ip);
+            }
+        }
+
+    } catch(const std::exception &e) {
         std::cerr << e.what() << std::endl;
+        return EXIT_FAILURE;
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }
