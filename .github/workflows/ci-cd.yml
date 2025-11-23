@@ -14,7 +14,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential cmake
+        sudo apt-get install -y build-essential cmake libgtest-dev
         
     - name: Configure CMake
       run: cmake -B build .
@@ -22,19 +22,19 @@ jobs:
     - name: Build
       run: cmake --build build
       
-    - name: Check executable exists
+    - name: Run Tests
       run: |
-        ls -la build/
-        test -f build/lb2 && echo "Executable found" || echo "Executable not found"
+        if [ -f "./build/ip_filter_test" ]; then
+          ./build/ip_filter_test
+        else
+          echo "Tests not built - skipping"
+        fi
       
     - name: Run Program
-      run: |
-        cd build
-        ./lb2 < ../ip_filter.tsv
+      run: ./build/lb2 < ip_filter.tsv
 
   build-windows:
     runs-on: windows-latest
-    needs: build-linux 
     
     steps:
     - uses: actions/checkout@v3

@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SRC_FILES 
-	ip_filter.cpp
+    ip_filter.cpp
     base/base.cpp
 )
 
@@ -37,6 +37,9 @@ if(GTest_FOUND)
     target_link_libraries(ip_filter_test GTest::gtest GTest::gtest_main)
     target_include_directories(ip_filter_test PRIVATE head)
     
+    include(GoogleTest)
+    gtest_discover_tests(ip_filter_test)
+    
 else()
     message(STATUS "GoogleTest not found - skipping tests")
 endif()
@@ -50,5 +53,7 @@ set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
 
 set(CPACK_PACKAGE_CONTACT lerakirpu@mail.ru)
+set(CPACK_PACKAGE_NAME "lb2")
+set(CPACK_PACKAGE_DESCRIPTION "IP Filter Application")
 
 include(CPack)

@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include "base.hpp"
+#include "head/base.hpp"  
 
 int main(int, char **) {
     try {
@@ -21,7 +21,6 @@ int main(int, char **) {
             ip_pool.push_back(ip_int);
         }
 
-        // Reverse lexicographically sort
         std::sort(ip_pool.begin(), ip_pool.end(), [](const std::vector<int>& a, const std::vector<int>& b) {
             for(size_t i = 0; i < std::min(a.size(), b.size()); ++i) {
                 if(a[i] != b[i]) {
@@ -31,26 +30,22 @@ int main(int, char **) {
             return a.size() > b.size();
         });
 
-        // Print all IPs
         for(const auto& ip : ip_pool) {
             print_ip(ip);
         }
 
-        // Filter by first byte = 1
         for(const auto& ip : ip_pool) {
             if(ip.at(0) == 1) {
                 print_ip(ip);
             }
         }
 
-        // Filter by first byte = 46 and second = 70
         for(const auto& ip : ip_pool) {
             if(ip.at(0) == 46 && ip.at(1) == 70) {
                 print_ip(ip);
             }
         }
 
-        // Filter by any byte = 46
         for(const auto& ip : ip_pool) {
             if(std::any_of(ip.begin(), ip.end(), [](int byte) { return byte == 46; })) {
                 print_ip(ip);
