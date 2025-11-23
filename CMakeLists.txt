@@ -12,13 +12,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SRC_FILES 
-	ip_filter.cpp
+    ip_filter.cpp
     base/base.cpp
 )
 
 include_directories(head)
 
-add_executable(${PROJECT_NAME} ${SRC_FILES}) # название итогового приложения и из чего его собирать
+add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 install(TARGETS lb2 RUNTIME DESTINATION bin)
 
@@ -29,23 +29,27 @@ FetchContent_Declare(
     googletest
     URL https://github.com/google/googletest/archive/03597a01ee50ed33e9fdabf8a2def5d696d7a9d2.zip
 )
+
 FetchContent_MakeAvailable(googletest)
 
-# Создание тестового исполняемого файла
-add_executable(ip_filter_test
-    gtests.cpp          
-    base/base.cpp     
-)
+# Проверка что GoogleTest загрузился
+if(googletest_POPULATED)
+    message(STATUS "GoogleTest successfully downloaded")
+    
+    add_executable(ip_filter_test
+        gtests.cpp          
+        base/base.cpp     
+    )
 
-# Связывание с GoogleTest
-target_link_libraries(ip_filter_test gtest_main)
+    target_link_libraries(ip_filter_test gtest_main)
+    target_include_directories(ip_filter_test PRIVATE head)
 
-# Директории включения для тестов
-target_include_directories(ip_filter_test PRIVATE head)
-
-# Регистрация тестов в CTest
-include(GoogleTest)
-gtest_discover_tests(ip_filter_test)
+    include(GoogleTest)
+    gtest_discover_tests(ip_filter_test)
+    
+else()
+    message(WARNING "GoogleTest not available - tests will not be built")
+endif()
 
 set(CPACK_GENERATOR DEB)
 
@@ -54,5 +58,10 @@ set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
 
 set(CPACK_PACKAGE_CONTACT lerakirpu@mail.ru)
+
+# Дополнительные настройки для пакета
+set(CPACK_PACKAGE_NAME "lb2")
+set(CPACK_PACKAGE_DESCRIPTION "IP Filter Application")
+set(CPACK_PACKAGE_VENDOR "Your Name")
 
 include(CPack)
