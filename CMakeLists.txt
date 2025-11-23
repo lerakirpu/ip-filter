@@ -22,7 +22,26 @@ add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 install(TARGETS lb2 RUNTIME DESTINATION bin)
 
-message(STATUS "Tests are temporarily disabled for CI/CD")
+enable_testing()
+
+find_package(GTest QUIET)
+
+if(GTest_FOUND)
+    message(STATUS "GoogleTest found - building tests")
+    
+    add_executable(ip_filter_test
+        gtests.cpp          
+        base/base.cpp     
+    )
+
+    target_link_libraries(ip_filter_test GTest::gtest GTest::gtest_main)
+    target_include_directories(ip_filter_test PRIVATE head)
+    
+else()
+    message(STATUS "GoogleTest not found - skipping tests")
+endif()
+
+message(STATUS "Build configuration complete")
 
 set(CPACK_GENERATOR DEB)
 
