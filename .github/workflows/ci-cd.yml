@@ -16,60 +16,14 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y build-essential cmake libgtest-dev
         
-    - name: Check project structure
-      run: |
-        echo "=== Project Structure ==="
-        find . -name "*.cpp" -o -name "*.hpp" -o -name "*.h" | sort
-        echo "=== Files in root ==="
-        ls -la
-        echo "=== Files in base/ ==="
-        ls -la base/ || echo "No base directory"
-        echo "=== Files in head/ ==="
-        ls -la head/ || echo "No head directory"
-        
     - name: Configure CMake
-      run: |
-        echo "=== Configuring CMake ==="
-        cmake -B build . -DPATCH_VERSION=${{ github.run_number }}
+      run: cmake -B build .
       
     - name: Build project
-      run: |
-        echo "=== Building project ==="
-        cmake --build build --verbose
-        
-    - name: Check build results
-      run: |
-        echo "=== Build results ==="
-        ls -la build/ || echo "No build directory"
-        find build/ -name "lab2" -o -name "lab2" -o -name "*.exe" | head -10
-        
-    - name: Run tests
-      run: |
-        echo "=== Running tests ==="
-        if [ -f "./build/ip_filter_test" ]; then
-          ./build/ip_filter_test
-        else
-          echo "Tests not built, skipping"
-          find build/ -name "*test*" | head -10
-        fi
-        
+      run: cmake --build build
+      
     - name: Run main program
-      run: |
-        echo "=== Running main program ==="
-        # Попробуем разные возможные имена
-        if [ -f "./build/lab2" ]; then
-          echo "Found lab2, running..."
-          ./build/lab2 < ./ip_filter.tsv
-        elif [ -f "./build/lab2" ]; then
-          echo "Found lab2, running..."
-          ./build/lab2 < ./ip_filter.tsv
-        else
-          echo "Main program not found. Available files in build/:"
-          ls -la build/
-          echo "Trying to find any executable:"
-          find build/ -type f -executable | head -10
-          exit 1
-        fi
+      run: ./build/lab2 < ./ip_filter.tsv
 
   build-windows:
     runs-on: windows-latest
@@ -78,32 +32,10 @@ jobs:
     - uses: actions/checkout@v3
     
     - name: Configure CMake
-      run: |
-        echo "=== Configuring CMake on Windows ==="
-        cmake -B build .
+      run: cmake -B build .
       
     - name: Build
-      run: |
-        echo "=== Building on Windows ==="
-        cmake --build build --config Release --verbose
-        
-    - name: Check build results
-      run: |
-        echo "=== Windows build results ==="
-        dir build\Release 2>nul || echo "No Release directory"
-        dir build 2>nul || echo "No build directory"
-        
+      run: cmake --build build --config Release
+      
     - name: Run Program
-      run: |
-        echo "=== Running program on Windows ==="
-        if (Test-Path "build\Release\lab2.exe") {
-          echo "Found lab2.exe"
-          Get-Content ip_filter.tsv | .\build\Release\lab2.exe
-        } elseif (Test-Path "build\Release\lab2.exe") {
-          echo "Found lab2.exe"
-          Get-Content ip_filter.tsv | .\build\Release\lab2.exe
-        } else {
-          echo "Main program not found. Available files:"
-          dir build /s 2>nul || echo "Cannot list build directory"
-          exit 1
-        }
+      run: Get-Content ip_filter.tsv | .\build\Release\lab2.exe
