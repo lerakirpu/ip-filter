@@ -16,22 +16,34 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y build-essential cmake libgtest-dev
         
+    - name: Check project structure
+      run: |
+        find . -name "*.cpp" -o -name "*.hpp" | sort
+        ls -la
+        pwd
+        
     - name: Configure CMake
-      run: cmake -B build .
+      run: cmake -B build . -DPATCH_VERSION=${{ github.run_number }}
       
-    - name: Build
+    - name: Build project
       run: cmake --build build
       
-    - name: Run Tests
+    - name: Run tests
       run: |
         if [ -f "./build/ip_filter_test" ]; then
           ./build/ip_filter_test
         else
-          echo "Tests not built - skipping"
+          echo "Tests not built, skipping"
         fi
-      
-    - name: Run Program
-      run: ./build/lb2 < ip_filter.tsv
+        
+    - name: Run main program
+      run: |
+        if [ -f "./build/lb2" ]; then
+          ./build/lb2 < ./ip_filter.tsv
+        else
+          echo "Main program not found"
+          exit 1
+        fi
 
   build-windows:
     runs-on: windows-latest
@@ -47,4 +59,9 @@ jobs:
       
     - name: Run Program
       run: |
-        Get-Content ip_filter.tsv | .\build\Release\lb2.exe
+        if (Test-Path "build\Release\lb2.exe") {
+          Get-Content ip_filter.tsv | .\build\Release\lb2.exe
+        } else {
+          Write-Error "Main program not found"
+          exit 1
+        }
