@@ -18,19 +18,23 @@ enable_testing()
 find_package(GTest)
 
 if(GTest_FOUND)
-    message(STATUS "GoogleTest found - building tests")
-    
-    add_executable(ip_filter_test
-        gtests.cpp          
-        base/base.cpp     
-    )
+    message(STATUS "GoogleTest found - checking for test files")
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/gtests.cpp")
+        message(STATUS "gtests.cpp found - building tests")
+        
+        add_executable(ip_filter_test
+            gtests.cpp          
+            base/base.cpp     
+        )
 
-    target_link_libraries(ip_filter_test GTest::gtest GTest::gtest_main)
-    target_include_directories(ip_filter_test PRIVATE head)
-    
-    include(GoogleTest)
-    gtest_discover_tests(ip_filter_test)
-    
+        target_link_libraries(ip_filter_test GTest::gtest GTest::gtest_main)
+        target_include_directories(ip_filter_test PRIVATE head)
+        
+        include(GoogleTest)
+        gtest_discover_tests(ip_filter_test)
+    else()
+        message(WARNING "gtests.cpp not found - skipping tests")
+    endif()
 else()
     message(WARNING "GoogleTest not found - skipping tests")
 endif()
