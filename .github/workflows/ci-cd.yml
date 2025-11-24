@@ -22,6 +22,14 @@ jobs:
     - name: Build project
       run: cmake --build build
       
+    - name: Run tests
+      run: |
+        if [ -f "./build/ip_filter_test" ]; then
+          ./build/ip_filter_test
+        else
+          echo "Tests not built - skipping"
+        fi
+      
     - name: Run main program
       run: ./build/lab2 < ./ip_filter.tsv
 
@@ -36,6 +44,14 @@ jobs:
       
     - name: Build
       run: cmake --build build --config Release
+      
+    - name: Run tests
+      run: |
+        if (Test-Path "build\Release\ip_filter_test.exe") {
+          .\build\Release\ip_filter_test.exe
+        } else {
+          echo "Tests not built - skipping"
+        }
       
     - name: Run Program
       run: Get-Content ip_filter.tsv | .\build\Release\lab2.exe
