@@ -41,7 +41,7 @@ jobs:
       run: |
         echo "=== Build results ==="
         ls -la build/ || echo "No build directory"
-        find build/ -name "lb2" -o -name "lab2" -o -name "*.exe" | head -10
+        find build/ -name "lab2" -o -name "lab2" -o -name "*.exe" | head -10
         
     - name: Run tests
       run: |
@@ -57,9 +57,9 @@ jobs:
       run: |
         echo "=== Running main program ==="
         # Попробуем разные возможные имена
-        if [ -f "./build/lb2" ]; then
-          echo "Found lb2, running..."
-          ./build/lb2 < ./ip_filter.tsv
+        if [ -f "./build/lab2" ]; then
+          echo "Found lab2, running..."
+          ./build/lab2 < ./ip_filter.tsv
         elif [ -f "./build/lab2" ]; then
           echo "Found lab2, running..."
           ./build/lab2 < ./ip_filter.tsv
@@ -96,9 +96,9 @@ jobs:
     - name: Run Program
       run: |
         echo "=== Running program on Windows ==="
-        if (Test-Path "build\Release\lb2.exe") {
-          echo "Found lb2.exe"
-          Get-Content ip_filter.tsv | .\build\Release\lb2.exe
+        if (Test-Path "build\Release\lab2.exe") {
+          echo "Found lab2.exe"
+          Get-Content ip_filter.tsv | .\build\Release\lab2.exe
         } elseif (Test-Path "build\Release\lab2.exe") {
           echo "Found lab2.exe"
           Get-Content ip_filter.tsv | .\build\Release\lab2.exe
