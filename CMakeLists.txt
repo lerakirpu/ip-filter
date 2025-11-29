@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10.0)
+cmake_minimum_required(VERSION 3.15) 
 
 set(PATCH_VERSION "2" CACHE INTERNAL "Patch version")
 set(PROJECT_VERSION 0.0.${PATCH_VERSION})
@@ -28,24 +28,50 @@ enable_testing()
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/gtests.cpp")
     message(STATUS "Found gtests.cpp - configuring tests")
     
-    find_package(GTest QUIET)
+    if(NOT GTest_FOUND)
+        message(STATUS "GoogleTest not found in system, fetching...")
+        
+        include(FetchContent)
+        FetchContent_Declare(
+            googletest
+            URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+        )
+        
+        set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+        FetchContent_MakeAvailable(googletest)
+        
+        # Проверяем успешность загрузки
+        if(TARGET gtest AND TARGET gtest_main)
+            set(GTest_FOUND TRUE)
+            message(STATUS "GoogleTest successfully fetched")
+        else()
+            message(WARNING "Failed to fetch GoogleTest")
+        endif()
+    else()
+        message(STATUS "GoogleTest found in system")
+    endif()
     
     if(GTest_FOUND)
-        message(STATUS "GoogleTest found - building tests")
+        message(STATUS "Building tests")
         
         add_executable(ip_filter_test
             gtests.cpp          
             base/base.cpp     
         )
 
-        target_link_libraries(ip_filter_test GTest::gtest GTest::gtest_main)
+        if(TARGET GTest::gtest)
+            target_link_libraries(ip_filter_test GTest::gtest GTest::gtest_main)
+        else()
+            target_link_libraries(ip_filter_test gtest gtest_main)
+        endif()
+        
         target_include_directories(ip_filter_test PRIVATE head)
         
         include(GoogleTest)
         gtest_discover_tests(ip_filter_test)
         
     else()
-        message(STATUS "GoogleTest not found - skipping tests")
+        message(STATUS "GoogleTest not available - skipping tests")
     endif()
 else()
     message(STATUS "gtests.cpp not found - skipping tests")
