@@ -1,10 +1,9 @@
-// gtests.cpp
 #include <gtest/gtest.h>
 #include <vector>
 #include <string>
 #include <algorithm>
 
-// Сортировка
+// Сортировка в обратном порядке
 TEST(IPFilterTest, SortTest) {
     std::vector<std::vector<std::string>> ip_pool = {
         {"1", "1", "234", "8"},
@@ -13,11 +12,21 @@ TEST(IPFilterTest, SortTest) {
         {"222", "82", "198", "61"}
     };
     
-    std::sort(ip_pool.begin(), ip_pool.end(), [](auto& a, auto& b) {
-        return a > b;
+    // Сортируем в обратном порядке 
+    std::sort(ip_pool.begin(), ip_pool.end(), [](const auto& a, const auto& b) {
+        // Сравниваем по октетам
+        for (int i = 0; i < 4; i++) {
+            if (a[i] != b[i]) {
+                return a[i] > b[i]; // Обратный порядок
+            }
+        }
+        return false;
     });
     
     EXPECT_EQ(ip_pool[0][0], "222");
+    EXPECT_EQ(ip_pool[0][1], "173"); 
+    EXPECT_EQ(ip_pool[1][0], "222");
+    EXPECT_EQ(ip_pool[1][1], "82"); 
     EXPECT_EQ(ip_pool[2][0], "46");
     EXPECT_EQ(ip_pool[3][0], "1");
 }
