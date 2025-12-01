@@ -1,81 +1,16 @@
-#include <gtest/gtest.h>
-#include <vector>
-#include <string>
-#include <algorithm>
-
-// Сортировка в обратном порядке
-TEST(IPFilterTest, SortTest) {
-    std::vector<std::vector<std::string>> ip_pool = {
-        {"1", "1", "234", "8"},
-        {"222", "173", "235", "246"},
-        {"46", "70", "225", "39"},
-        {"222", "82", "198", "61"}
-    };
-
-    std::sort(ip_pool.begin(), ip_pool.end(), [](const auto& a, const auto& b) {
-        // Сравниваем по октетам
-        for (int i = 0; i < 4; i++) {
-            if (a[i] != b[i]) {
-                return a[i] > b[i]; // Обратный порядок
-            }
-        }
-        return false;
-    });
-
-    EXPECT_EQ(ip_pool[0][0], "222");
-    EXPECT_EQ(ip_pool[0][1], "82"); 
-    EXPECT_EQ(ip_pool[1][0], "222");
-    EXPECT_EQ(ip_pool[1][1], "173"); 
-    EXPECT_EQ(ip_pool[2][0], "46");
-    EXPECT_EQ(ip_pool[3][0], "1");
+#include<vector>
+#include<string>
+#include<gtest/gtest.h>
+#include"../head/base.hpp"
+TEST(firstSplit,test1){
+    std::vector<std::string> ans{"101.105.104.255","0","1"};
+    EXPECT_EQ(split("101.105.104.255	0	1",'\t'), ans);
 }
-
-// Фильтр по первому октету 46
-TEST(IPFilterTest, FilterFirstByte46) {
-    std::vector<std::vector<std::string>> ip_pool = {
-        {"46", "70", "225", "39"},
-        {"222", "173", "235", "246"},
-        {"46", "70", "147", "26"},
-        {"1", "87", "203", "225"}
-    };
-    
-    std::vector<std::vector<std::string>> result;
-    for (const auto& ip : ip_pool) {
-        if (ip[0] == "46") {
-            result.push_back(ip);
-        }
-    }
-    
-    EXPECT_EQ(result.size(), 2);
-    for (const auto& ip : result) {
-        EXPECT_EQ(ip[0], "46");
-    }
+TEST(secondSplit,test2){
+    std::vector<std::string> a{"113", "162", "145", "156"};
+    EXPECT_EQ(split("113.162.145.156", '.'), a);
 }
-
-// Фильтр по двум октетам 46 и 70
-TEST(IPFilterTest, FilterTwoBytes46_70) {
-    std::vector<std::vector<std::string>> ip_pool = {
-        {"46", "70", "225", "39"},
-        {"222", "173", "235", "246"},
-        {"46", "70", "147", "26"},
-        {"1", "87", "203", "225"}
-    };
-    
-    std::vector<std::vector<std::string>> result;
-    for (const auto& ip : ip_pool) {
-        if (ip[0] == "46" && ip[1] == "70") {
-            result.push_back(ip);
-        }
-    }
-    
-    EXPECT_EQ(result.size(), 2);
-    for (const auto& ip : result) {
-        EXPECT_EQ(ip[0], "46");
-        EXPECT_EQ(ip[1], "70");
-    }
-}
-
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+TEST(ThirdSplit,test2){
+    std::vector<std::string> a{"255", "255", "255", "255"};
+    EXPECT_EQ(split("255.255.255.255", '.'), a);
 }
