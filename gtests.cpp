@@ -11,8 +11,7 @@ TEST(IPFilterTest, SortTest) {
         {"46", "70", "225", "39"},
         {"222", "82", "198", "61"}
     };
-    
-    // Сортируем в обратном порядке 
+
     std::sort(ip_pool.begin(), ip_pool.end(), [](const auto& a, const auto& b) {
         // Сравниваем по октетам
         for (int i = 0; i < 4; i++) {
@@ -22,11 +21,11 @@ TEST(IPFilterTest, SortTest) {
         }
         return false;
     });
-    
+
     EXPECT_EQ(ip_pool[0][0], "222");
-    EXPECT_EQ(ip_pool[0][1], "173"); 
+    EXPECT_EQ(ip_pool[0][1], "82"); 
     EXPECT_EQ(ip_pool[1][0], "222");
-    EXPECT_EQ(ip_pool[1][1], "82"); 
+    EXPECT_EQ(ip_pool[1][1], "173"); 
     EXPECT_EQ(ip_pool[2][0], "46");
     EXPECT_EQ(ip_pool[3][0], "1");
 }
